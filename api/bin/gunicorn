@@ -1,0 +1,27 @@
+#!/bin/sh
+
+NAME="insight"
+DIR=/var/www/insightIntranet/api/insight
+USER=django
+GROUP=django
+WORKERS=3
+BIND=unix:/home/django/run/gunicorn.sock
+DJANGO_SETTINGS_MODULE=insight.settings
+DJANGO_WSGI_MODULE=insight.wsgi
+LOG_LEVEL=error
+
+cd $DIR
+cd ..
+source .env/bin/activate
+
+export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
+export PYTHONPATH=$DIR:$PYTHONPATH
+
+exec bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
+  --name $NAME \
+  --workers $WORKERS \
+  --user=$USER \
+  --group=$GROUP \
+  --bind=$BIND \
+  --log-level=$LOG_LEVEL \
+  --log-file=-
